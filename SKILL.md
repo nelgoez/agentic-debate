@@ -1,6 +1,11 @@
+---
+name: agentic-debate
+description: Multi-agent role-play for structured decisions — dispatches 2-3 AI agents with Tavily/Context7 research, then synthesizes a recommendation with comparison table
+---
+
 # Agentic Debate — Multi-Agent Role-Play for Decisions
 
-A structured, research-backed debate between 2–3 AI agents, each defending a different approach to a decision. Each agent researches independently via Tavily, presents arguments with sources, then the orchestrator synthesizes a recommendation.
+A structured, research-backed debate between 2–3 AI agents, each defending a different approach to a decision. Each agent researches independently via Tavily (web) and Context7 (library docs), presents arguments with sources, then the orchestrator synthesizes a recommendation.
 
 Triggers: `/agentic-debate`, `debate this`, `run a debate between agents`, `multi-agent debate`
 
@@ -24,8 +29,12 @@ Customize personalities as needed for the specific decision.
 
 Dispatch one subagent per option in parallel. Each receives:
 - The full context (project, stack, options)
-- 3–4 Tavily search queries specific to their argument
+- 3–4 research queries specific to their argument
 - Instructions to return arguments with sources in ≤350 words
+
+Available research tools:
+- **Tavily**: web search for news, blog posts, general information
+- **Context7**: library documentation for frameworks, APIs, SDKs (use `context7_resolve-library-id` + `context7_query-docs`)
 
 **Subagent prompt template:**
 
@@ -33,11 +42,14 @@ Dispatch one subagent per option in parallel. Each receives:
 You are Agent {LABEL} — {PERSONALITY}.
 Context: {full project and decision context}
 Your position: DEFEND Option {LABEL} ({short description}).
-Use Tavily to research: {QUERIES}
+Research tools available:
+  - Tavily (web search): use for news, articles, market data
+  - Context7 (docs): use for framework/library documentation and API references
+Queries: {QUERIES}
 Return your arguments with sources in ≤350 words.
 ```
 
-All agents MUST use at least 2 real Tavily queries. No invented data. Each returns sources (URLs) with their claims.
+All agents MUST use at least 2 real research queries across Tavily/Context7. No invented data. Each returns sources (URLs) with their claims.
 
 ### Phase 3 — Synthesis
 
@@ -61,7 +73,7 @@ Present the options with your recommendation and wait for user choice before imp
 
 ## Rules
 
-- Each agent MUST use at least 2 real Tavily/Web search queries
+- Each agent MUST use at least 2 real research queries (Tavily web search + Context7 library docs)
 - Each agent returns sources (URLs) with their claims
 - No agent concedes before the synthesis phase
 - Final recommendation is YOURS (the orchestrator), not the agents'
